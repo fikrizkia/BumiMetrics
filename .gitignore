@@ -1,0 +1,32 @@
+# Data & Confidential Datasets (Rahasia - Jangan diunggah ke GitHub)
+data/
+*.xlsx
+*.xls
+*.csv
+*.parquet
+*.json.bak
+
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE & Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node & Temp
+node_modules/
+dist/
+build/
+*.log
+
+# Python cache & virtual environment
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+venv/
+.venv/
