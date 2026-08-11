@@ -1,0 +1,335 @@
+/* ===================================================================
+   BumiMetrics - Enhanced Responsive Stylesheet
+   Optimasi Lengkap: Mobile/HP (<768px), Tablet (768px-1024px), Laptop/Desktop (>1024px)
+   =================================================================== */
+
+/* --- 1. Global Touch & Scroll Adaptations --- */
+html, body {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.app-container {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: var(--bg-main);
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.content-wrapper {
+  max-width: 1440px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px 32px 64px 32px;
+}
+
+/* --- 2. Mobile Bottom Navigation Bar (<1024px) --- */
+.mobile-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: calc(64px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--surface-border);
+  z-index: 50;
+  justify-content: space-around;
+  align-items: center;
+  box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.08);
+}
+
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: var(--text-subtle);
+  text-decoration: none;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: var(--radius-md);
+  transition: var(--transition);
+  min-width: 52px;
+  min-height: 48px;
+  cursor: pointer;
+}
+
+.mobile-nav-item .material-symbols-outlined {
+  font-size: 22px;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.mobile-nav-item:active {
+  transform: scale(0.92);
+}
+
+.mobile-nav-item.active {
+  color: var(--primary);
+  background-color: rgba(0, 108, 73, 0.08);
+}
+
+.mobile-nav-item.active .material-symbols-outlined {
+  font-variation-settings: 'FILL' 1;
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+/* --- 3. Breakpoint: Laptop & Desktop Standar (1024px - 1440px+) --- */
+@media (min-width: 1024px) {
+  .sidebar {
+    width: 275px;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    flex-shrink: 0;
+  }
+
+  .sidebar.collapsed {
+    width: 76px !important;
+  }
+
+  .mobile-bottom-nav {
+    display: none !important;
+  }
+
+  .content-wrapper {
+    padding: 24px 32px 64px 32px;
+  }
+}
+
+/* --- 4. Breakpoint: Tablet (768px - 1023px) --- */
+@media (max-width: 1023px) {
+  .sidebar {
+    display: none !important;
+  }
+
+  .mobile-bottom-nav {
+    display: flex !important;
+  }
+
+  .content-wrapper {
+    padding: 20px 20px 96px 20px;
+  }
+
+  .top-navbar {
+    padding: 12px 20px;
+  }
+
+  .heatmap-grid {
+    grid-template-columns: repeat(6, 1fr) !important;
+  }
+}
+
+/* --- 5. Breakpoint: Mobile / HP (<768px) --- */
+@media (max-width: 767px) {
+  .content-wrapper {
+    padding: 16px 14px 100px 14px;
+  }
+
+  /* Top App Bar di HP */
+  .top-navbar {
+    padding: 10px 14px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .top-nav-left {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
+  .top-nav-left .model-badge {
+    display: none;
+  }
+
+  .top-nav-right {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .filter-pill-container {
+    flex: 1;
+    min-width: 180px;
+    padding: 3px 8px;
+    font-size: 12px;
+  }
+
+  .filter-pill-container .custom-select {
+    font-size: 12px;
+  }
+
+  .climate-status-badge {
+    padding: 4px 10px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  /* Hero KPI Cards di HP */
+  .tile-value {
+    font-size: 28px !important;
+  }
+
+  .dashboard-tile {
+    padding: 16px !important;
+    border-radius: 14px !important;
+  }
+
+  .tile-header {
+    margin-bottom: 10px;
+  }
+
+  .tile-icon-box {
+    width: 34px;
+    height: 34px;
+  }
+
+  /* Timeline Slider di HP */
+  .timeline-card {
+    padding: 16px 14px;
+  }
+
+  .timeline-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .timeline-header button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .timeline-slider-wrapper {
+    margin-top: 6px;
+  }
+
+  .timeline-slider::-webkit-slider-thumb {
+    width: 26px;
+    height: 26px;
+  }
+
+  .timeline-ticks {
+    font-size: 10px;
+  }
+
+  /* Heatmap Calendar di HP */
+  .heatmap-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 6px !important;
+  }
+
+  .heatmap-cell {
+    padding: 8px 2px;
+  }
+
+  .heatmap-month {
+    font-size: 10px;
+  }
+
+  .heatmap-val {
+    font-size: 12px;
+  }
+
+  /* 4 Skenario Grid di HP */
+  .scenario-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  .scenario-card {
+    padding: 16px !important;
+  }
+
+  /* Matrix Table di HP (Smooth Swipe) */
+  .matrix-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 -6px;
+    padding: 0 6px;
+    border-radius: 8px;
+  }
+
+  .matrix-table {
+    min-width: 680px;
+    font-size: 11px;
+  }
+
+  .matrix-table th, .matrix-table td {
+    padding: 8px 6px !important;
+    font-size: 11px;
+  }
+
+  /* Chat & Simulator AI di HP */
+  .chat-box {
+    height: 300px !important;
+  }
+
+  .chat-msg {
+    max-width: 92% !important;
+    font-size: 12px !important;
+  }
+
+  /* Modal Form di HP */
+  .modal-container {
+    padding: 12px;
+    align-items: flex-end;
+  }
+
+  .modal-content {
+    max-width: 100% !important;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
+/* --- 6. Breakpoint: Layar Sangat Kecil / Mini (<380px) --- */
+@media (max-width: 379px) {
+  .heatmap-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+
+  .tile-value {
+    font-size: 24px !important;
+  }
+
+  .mobile-nav-item {
+    font-size: 9px;
+    padding: 4px 6px;
+    min-width: 44px;
+  }
+
+  .mobile-nav-item .material-symbols-outlined {
+    font-size: 20px;
+  }
+}
+

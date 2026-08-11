@@ -1,0 +1,21 @@
+{
+  "model_architecture": "Vector Autoregression (VAR) & Lagged Random Forest Regressor",
+  "training_samples_months": 360,
+  "period_trained": "1996 - 2025 (30 Tahun)",
+  "period_forecasted": "2026 (12 Bulan)",
+  "features": [
+    "Bulan_Num",
+    "Curah_Hujan_mm_lag1",
+    "Kelembapan_Percent_lag1",
+    "Suhu_C_lag1",
+    "Curah_Hujan_mm_lag2",
+    "Kelembapan_Percent_lag2",
+    "Suhu_C_lag2"
+  ],
+  "metrics": {
+    "temperature_r2": 0.9173,
+    "temperature_mse": 0.0324,
+    "rainfall_r2": 0.8533
+  },
+  "training_status": "SUCCESS"
+}

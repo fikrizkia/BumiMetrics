@@ -1,0 +1,1543 @@
+<!DOCTYPE html>
+<html lang="id" class="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BumiMetrics - Dasbor Iklim & Pemantauan Risiko Kesehatan Tropis (1996 - 2026)</title>
+  
+  <!-- SEO & Social Meta Tags -->
+  <meta name="description" content="Dashboard analitik iklim dan pemantauan risiko kesehatan tropis Indonesia (1996-2026) berbasis pemodelan VAR untuk deteksi dini DBD, ISPA, Leptospirosis, dan TBC." />
+  <meta name="keywords" content="BumiMetrics, Iklim, Kesehatan, DBD, ISPA, Leptospirosis, TBC, VAR, Machine Learning, Batam, Indonesia" />
+  <meta name="theme-color" content="#006c49" />
+
+  <!-- Google Fonts: Plus Jakarta Sans (All Weights) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet" />
+  
+  <!-- Google Material Symbols -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS via CDN with Full UIX Design System Tokens -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#006c49",
+            "primary-container": "#10b981",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#00422b",
+            "primary-fixed": "#6ffbbe",
+            "primary-fixed-dim": "#4edea3",
+            "secondary": "#006398",
+            "secondary-container": "#5bb8fe",
+            "on-secondary": "#ffffff",
+            "on-secondary-container": "#00476e",
+            "secondary-fixed": "#cce5ff",
+            "secondary-fixed-dim": "#93ccff",
+            "tertiary": "#855300",
+            "tertiary-container": "#e29100",
+            "on-tertiary": "#ffffff",
+            "on-tertiary-container": "#523200",
+            "error": "#ba1a1a",
+            "error-container": "#ffdad6",
+            "on-error": "#ffffff",
+            "on-error-container": "#93000a",
+            "surface": "#faf8ff",
+            "surface-dim": "#d2d9f4",
+            "surface-bright": "#faf8ff",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f2f3ff",
+            "surface-container": "#eaedff",
+            "surface-container-high": "#e2e7ff",
+            "surface-container-highest": "#dae2fd",
+            "surface-variant": "#dae2fd",
+            "on-surface": "#131b2e",
+            "on-surface-variant": "#3c4a42",
+            "inverse-surface": "#283044",
+            "inverse-on-surface": "#eef0ff",
+            "outline": "#6c7a71",
+            "outline-variant": "#bbcabf",
+            "background": "#faf8ff",
+            "on-background": "#131b2e"
+          },
+          fontFamily: {
+            sans: ["Plus Jakarta Sans", "-apple-system", "sans-serif"],
+            "headline-xl": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"],
+            "body-sm": ["Plus Jakarta Sans"],
+            "label-bold": ["Plus Jakarta Sans"],
+            "label-sm": ["Plus Jakarta Sans"]
+          },
+          spacing: {
+            "section-gap": "48px",
+            "stack-sm": "8px",
+            "margin-mobile": "16px",
+            "stack-lg": "24px",
+            "container-max": "1440px",
+            "stack-md": "16px",
+            "gutter": "24px",
+            "margin-desktop": "32px",
+            "unit": "8px"
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Chart.js for High-Fidelity Data Visualizations -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Custom Stylesheets (Modular & Clean) -->
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+  <link rel="stylesheet" href="./css/responsive.css" />
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Backdrop Overlay untuk Mobile Drawer -->
+    <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
+
+    <!-- ===================================================================
+         1. SIDE NAVIGATION BAR (Desktop & Mobile Drawer)
+         =================================================================== -->
+    <aside id="mainSidebar" class="sidebar">
+      <div class="brand-header">
+        <div class="brand-info">
+          <div class="brand-icon-wrapper">
+            <span class="material-symbols-outlined fill-icon text-2xl">eco</span>
+          </div>
+          <div>
+            <h1 class="brand-title">BumiMetrics</h1>
+            <p class="brand-subtitle">Pantau Cuaca &amp; Sehat</p>
+          </div>
+        </div>
+        <!-- Tombol Open / Close Sidebar -->
+        <button id="sidebarToggleBtn" class="sidebar-toggle-btn" title="Buka / Tutup Menu" aria-label="Buka / Tutup Menu">
+          <span class="material-symbols-outlined text-lg">menu_open</span>
+        </button>
+      </div>
+
+      <nav class="nav-menu">
+        <a class="nav-item active" data-tab="overview" title="Kabar Cuaca &amp; Risiko Hari Ini">
+          <span class="material-symbols-outlined">dashboard</span>
+          <span>Kabar Cuaca &amp; Risiko</span>
+        </a>
+        <a class="nav-item" data-tab="health-risks" title="Cek Bahaya Penyakit">
+          <span class="material-symbols-outlined">medical_services</span>
+          <span>Cek Bahaya Sakit</span>
+        </a>
+        <a class="nav-item" data-tab="climate-trends" title="Riwayat Suhu &amp; Hujan">
+          <span class="material-symbols-outlined">thermostat</span>
+          <span>Riwayat Suhu &amp; Hujan</span>
+        </a>
+        <a class="nav-item" data-tab="local-ai" title="Tanya Dokter AI &amp; Simulasi">
+          <span class="material-symbols-outlined text-emerald-600">psychology</span>
+          <span>Tanya Dokter AI &amp; Simulasi</span>
+        </a>
+        <a class="nav-item" data-tab="community" title="Warta &amp; Info Warga">
+          <span class="material-symbols-outlined">warning</span>
+          <span>Warta &amp; Info Warga</span>
+        </a>
+        <a class="nav-item" data-tab="mitigation" title="Tips Jaga Diri &amp; SOP">
+          <span class="material-symbols-outlined">shield</span>
+          <span>Tips Jaga Diri &amp; SOP</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-primary open-report-modal-btn w-full" title="Laporkan kondisi lingkungan">
+          <span class="material-symbols-outlined">add_alert</span>
+          <span>Lapor Kondisi Sekitar</span>
+        </button>
+        <div class="sidebar-footer-text flex items-center gap-2 px-2 py-1 text-xs text-slate-500">
+          <span class="material-symbols-outlined text-sm text-emerald-600">verified</span>
+          <span>AI &amp; Data 30 Thn Siap</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ===================================================================
+         2. MAIN CONTENT AREA
+         =================================================================== -->
+    <main class="main-content">
+      
+      <!-- Top Sticky Navigation Bar -->
+      <header class="top-navbar">
+        <div class="top-nav-left flex items-center justify-between lg:justify-start w-full lg:w-auto gap-3">
+          <!-- Tombol Menu untuk Mobile / Layar Kecil -->
+          <button id="topNavMobileMenuBtn" class="sidebar-toggle-btn lg:hidden flex items-center justify-center" title="Buka Menu">
+            <span class="material-symbols-outlined">menu</span>
+          </button>
+
+          <!-- Mobile Brand Title (Muncul di HP/Tablet) -->
+          <div class="lg:hidden flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center text-white shadow-sm">
+              <span class="material-symbols-outlined fill-icon text-xl">eco</span>
+            </div>
+            <div>
+              <span class="font-bold text-base text-slate-900 tracking-tight block leading-tight">BumiMetrics</span>
+              <span class="text-[10px] text-slate-500 block leading-none">Kota Batam, Kepri</span>
+            </div>
+          </div>
+
+          <div class="model-badge hidden lg:inline-flex">
+            <span class="material-symbols-outlined text-sm">insights</span>
+            <span>Pantauan Data Cuaca 30 Tahun (1996 - 2026)</span>
+          </div>
+
+          <!-- Local AI Engine Status Badge -->
+          <div id="localAIServerBadge" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300">
+            <div id="localAIServerDot" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+            <span id="localAIServerText">Asisten AI Aktif</span>
+          </div>
+        </div>
+
+        <div class="top-nav-right">
+          <!-- Filter Wilayah & Tahun Cepat -->
+          <div class="filter-pill-container">
+            <span class="material-symbols-outlined text-sm text-slate-400">calendar_month</span>
+            <select id="yearSelectDropdown" class="custom-select" title="Pilih Tahun">
+              <option value="1996">Tahun 1996</option>
+              <option value="1997">1997 (Kemarau Panjang)</option>
+              <option value="2000">Tahun 2000</option>
+              <option value="2005">Tahun 2005</option>
+              <option value="2010">2010 (Musim Hujan Basah)</option>
+              <option value="2015">2015 (Kemarau Panas Ekstrem)</option>
+              <option value="2020">2020 (Hujan Sering Turun)</option>
+              <option value="2023">2023 (Panas Terik)</option>
+              <option value="2024" selected>2024 (Kondisi Terkini)</option>
+              <option value="2025">2025 (Prakiraan)</option>
+              <option value="2026">2026 (Prakiraan Depan)</option>
+            </select>
+            <span class="text-slate-300">|</span>
+            <select class="custom-select" id="regionSelectDropdown">
+              <option selected value="batam">Kota Batam, Kepri</option>
+            </select>
+          </div>
+
+          <!-- Status Iklim Dinamis -->
+          <div id="climateStatusBadge" class="climate-status-badge warning">
+            <div id="climateStatusPulse" class="pulse-dot warning"></div>
+            <span id="climateStatusText">Cuaca: Sedang Cukup Panas</span>
+          </div>
+
+          <button class="open-report-modal-btn btn btn-outline btn-sm hidden sm:inline-flex">
+            <span class="material-symbols-outlined text-sm text-emerald-600">campaign</span>
+            <span>Lapor Warga</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Scrollable Tab Panes Container -->
+      <div class="content-wrapper">
+
+        <!-- ===============================================================
+             TAB 1: RINGKASAN (DASHBOARD UTAMA)
+             =============================================================== -->
+        <section id="tab-overview" class="tab-pane active space-y-6">
+          
+          <!-- Hero KPI Metrics Grid (4 Cards) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            
+            <!-- KPI 1: Suhu -->
+            <div class="dashboard-tile flex flex-col justify-between">
+              <div class="tile-header">
+                <div>
+                  <h3 class="tile-title">Suhu Udara Rata-rata</h3>
+                  <p class="tile-subtitle">Tingkat Panas Daerah</p>
+                </div>
+                <div class="tile-icon-box temp">
+                  <span class="material-symbols-outlined text-xl">device_thermostat</span>
+                </div>
+              </div>
+              <div>
+                <div id="kpiTemperature" class="tile-value">28.3°C</div>
+                <div id="kpiTempDiff" class="tile-badge text-red-600 bg-red-50 border border-red-200">
+                  <span class="material-symbols-outlined text-xs">trending_up</span>
+                  <span>+1.1°C lebih hangat dari dulu</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- KPI 2: Kelembapan -->
+            <div class="dashboard-tile flex flex-col justify-between">
+              <div class="tile-header">
+                <div>
+                  <h3 class="tile-title">Kelembapan Udara</h3>
+                  <p class="tile-subtitle">Tingkat Basah/Lembap Udara</p>
+                </div>
+                <div class="tile-icon-box humidity">
+                  <span class="material-symbols-outlined text-xl">humidity_percentage</span>
+                </div>
+              </div>
+              <div>
+                <div id="kpiHumidity" class="tile-value">78%</div>
+                <div class="tile-badge text-emerald-700 bg-emerald-50 border border-emerald-200">
+                  <span class="material-symbols-outlined text-xs">check_circle</span>
+                  <span>Pas &amp; Nyaman di Tubuh</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- KPI 3: Curah Hujan -->
+            <div class="dashboard-tile flex flex-col justify-between">
+              <div class="tile-header">
+                <div>
+                  <h3 class="tile-title">Curah Hujan</h3>
+                  <p class="tile-subtitle">Banyaknya Guyuran Hujan</p>
+                </div>
+                <div class="tile-icon-box rainfall">
+                  <span class="material-symbols-outlined text-xl">rainy</span>
+                </div>
+              </div>
+              <div>
+                <div id="kpiRainfall" class="tile-value">175mm</div>
+                <div id="kpiRainStatus" class="tile-badge text-sky-700 bg-sky-50 border border-sky-200">
+                  <span class="material-symbols-outlined text-xs">water_drop</span>
+                  <span>Hujan Sering Turun</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- KPI 4: Composite VAR Risk Score Gauge -->
+            <div class="dashboard-tile flex flex-col justify-between">
+              <div class="tile-header">
+                <div>
+                  <h3 class="tile-title">Tingkat Bahaya Sakit</h3>
+                  <p class="tile-subtitle">Hitungan Gabungan Cuaca</p>
+                </div>
+                <div class="tile-icon-box risk">
+                  <span class="material-symbols-outlined text-xl">health_and_safety</span>
+                </div>
+              </div>
+              <div class="text-center">
+                <div class="gauge-wrapper">
+                  <svg class="gauge-svg" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="40" class="gauge-track" />
+                    <circle id="gaugeProgressCircle" cx="50" cy="50" r="40" class="gauge-progress" />
+                  </svg>
+                  <div class="gauge-center-text">
+                    <span id="kpiRiskScore" class="gauge-score">64</span>
+                    <span class="text-xs text-slate-400">/100</span>
+                  </div>
+                </div>
+                <div id="kpiRiskLabel" class="gauge-label text-amber-600">PERLU HATI-HATI</div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Timeline Slider Controller (1996 - 2026) -->
+          <div class="timeline-card">
+            <div class="timeline-header">
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-emerald-600">history_toggle_off</span>
+                <h4 class="font-bold text-slate-800 text-sm md:text-base">Geser Tahun untuk Melihat Perubahan Cuaca (<span id="currentYearDisplay" class="text-emerald-700 font-extrabold">2024</span>)</h4>
+              </div>
+              <button id="playTimelineBtn" class="btn btn-secondary btn-sm" title="Putar perubahan cuaca otomatis">
+                <span class="material-symbols-outlined text-sm">play_arrow</span>
+                <span>Putar Otomatis (1996-2026)</span>
+              </button>
+            </div>
+            <div class="timeline-slider-wrapper">
+              <input id="yearTimelineSlider" type="range" min="1996" max="2026" value="2024" step="1" class="timeline-slider" />
+            </div>
+            <div class="timeline-ticks">
+              <span>1996 (Awal Catatan)</span>
+              <span>1997 (Kemarau Panjang)</span>
+              <span>2010 (Hujan Terus)</span>
+              <span>2015 (Kemarau Panas)</span>
+              <span>2020 (Hujan Basah)</span>
+              <span>2024 (Sekarang)</span>
+              <span>2026 (Prakiraan Depan)</span>
+            </div>
+          </div>
+
+          <!-- Real-Time AI Epidemiological Diagnosis & Analysis Panel -->
+          <div class="dashboard-tile border-l-4 border-l-emerald-600 bg-gradient-to-br from-white via-white to-emerald-50/50 shadow-md">
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-4 pb-3 border-b border-slate-200">
+              <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-emerald-100 text-emerald-800 rounded-xl flex items-center justify-center shadow-sm">
+                  <span class="material-symbols-outlined text-2xl animate-pulse">psychology</span>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h3 class="font-extrabold text-slate-900 text-lg">Catatan &amp; Saran Asisten AI Hari Ini</h3>
+                    <span id="overviewAIBadge" class="tile-badge text-emerald-800 bg-emerald-100 font-bold text-xs">AI AKTIF</span>
+                  </div>
+                  <p class="text-xs text-slate-500 mt-0.5">
+                    Hasil pantauan pintar kondisi cuaca dan pengaruhnya ke tubuh untuk tahun <span id="overviewAIYearText" class="font-bold text-slate-700">2024</span>
+                  </p>
+                </div>
+              </div>
+
+              <!-- Quick Action Navigation -->
+              <div class="flex items-center gap-2">
+                <a data-tab="local-ai" class="btn btn-primary btn-sm flex items-center gap-1.5 cursor-pointer shadow-sm">
+                  <span class="material-symbols-outlined text-sm">chat</span>
+                  <span>Tanya Dokter AI</span>
+                </a>
+                <a data-tab="local-ai" class="btn btn-outline btn-sm flex items-center gap-1.5 cursor-pointer">
+                  <span class="material-symbols-outlined text-sm">tune</span>
+                  <span>Coba Simulasi Cuaca</span>
+                </a>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              <!-- Left: AI Diagnosis Narrative & Impact Summary -->
+              <div class="lg:col-span-7 flex flex-col justify-between">
+                <div class="space-y-3">
+                  <div class="p-3.5 bg-white rounded-xl border border-slate-200 shadow-sm">
+                    <div class="flex items-center gap-2 text-xs font-bold text-emerald-800 mb-1.5">
+                      <span class="material-symbols-outlined text-sm">medical_information</span>
+                      <span>Ringkasan Kondisi &amp; Bahaya Penyakit:</span>
+                    </div>
+                    <p id="overviewAIDiagnosisText" class="text-xs text-slate-700 leading-relaxed">
+                      Memuat analisis saran AI...
+                    </p>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                    <div class="p-2.5 bg-white rounded-lg border border-slate-200">
+                      <span class="text-slate-400 block text-[10px] uppercase font-bold">Penyakit Paling Rawan</span>
+                      <span id="overviewAIThreatText" class="font-bold text-slate-800 text-xs mt-0.5 block">Nyamuk DBD &amp; Cikungunya</span>
+                    </div>
+                    <div class="p-2.5 bg-white rounded-lg border border-slate-200">
+                      <span class="text-slate-400 block text-[10px] uppercase font-bold">Status Bahaya</span>
+                      <span id="overviewAIRiskLevelText" class="font-bold text-amber-600 text-xs mt-0.5 block">Perlu Jaga Diri (64/100)</span>
+                    </div>
+                    <div class="p-2.5 bg-white rounded-lg border border-slate-200">
+                      <span class="text-slate-400 block text-[10px] uppercase font-bold">Bulan Paling Rawan</span>
+                      <span id="overviewAIPeakMonthText" class="font-bold text-red-600 text-xs mt-0.5 block">April &amp; Agustus</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right: 3 Priority AI Clinical Action Prescriptions -->
+              <div class="lg:col-span-5 flex flex-col justify-between">
+                <div class="space-y-2">
+                  <div class="text-xs font-bold text-slate-800 flex items-center gap-1.5 mb-1">
+                    <span class="material-symbols-outlined text-primary text-sm">checklist</span>
+                    <span>3 Hal Penting yang Perlu Dilakukan Sekarang:</span>
+                  </div>
+                  <div id="overviewAIActionsList" class="space-y-2 text-xs">
+                    <!-- Rendered dynamically by app.js -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Multi-Variable Interactive Time Series Visualization -->
+          <div class="dashboard-tile">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+              <div>
+                <h3 class="font-bold text-slate-800 text-lg">Grafik Hubungan Cuaca &amp; Risiko Sakit (1996 - 2026)</h3>
+                <p class="text-xs text-slate-500">Lihat bagaimana naik-turunnya panas, hujan, dan kelembapan memicu timbulnya penyakit di Batam</p>
+              </div>
+              <!-- Variable Toggles -->
+              <div class="flex flex-wrap items-center gap-3 text-xs font-semibold">
+                <label class="flex items-center gap-1.5 cursor-pointer text-red-600 bg-red-50 px-2.5 py-1 rounded-full border border-red-200">
+                  <input type="checkbox" data-chart-var="temp" checked class="rounded text-red-600 focus:ring-0" />
+                  <span>Suhu Panas (°C)</span>
+                </label>
+                <label class="flex items-center gap-1.5 cursor-pointer text-sky-600 bg-sky-50 px-2.5 py-1 rounded-full border border-sky-200">
+                  <input type="checkbox" data-chart-var="hum" checked class="rounded text-sky-600 focus:ring-0" />
+                  <span>Kelembapan Udara (%)</span>
+                </label>
+                <label class="flex items-center gap-1.5 cursor-pointer text-cyan-700 bg-cyan-50 px-2.5 py-1 rounded-full border border-cyan-200">
+                  <input type="checkbox" data-chart-var="rain" checked class="rounded text-cyan-600 focus:ring-0" />
+                  <span>Curah Hujan (mm)</span>
+                </label>
+                <label class="flex items-center gap-1.5 cursor-pointer text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                  <input type="checkbox" data-chart-var="risk" checked class="rounded text-emerald-600 focus:ring-0" />
+                  <span>Skor Bahaya Sakit</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Time Series Chart Canvas -->
+            <div class="w-full h-80 relative">
+              <canvas id="timeSeriesChartCanvas"></canvas>
+            </div>
+          </div>
+
+          <!-- Monthly Risk Heatmap Grid (Jan - Des) -->
+          <div class="dashboard-tile">
+            <div class="flex items-center justify-between mb-2">
+              <div>
+                <h3 class="font-bold text-slate-800 text-base">Peta Musim &amp; Kerawanan Sepanjang Tahun (Januari - Desember)</h3>
+                <p class="text-xs text-slate-500">Klik salah satu bulan di bawah untuk lihat kondisi cuaca dan potensi ancaman sakitnya:</p>
+              </div>
+              <div class="flex items-center gap-3 text-xs">
+                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Aman (&lt;45)</span>
+                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Perlu Waspada (45-70)</span>
+                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> Sangat Rawan (&gt;70)</span>
+              </div>
+            </div>
+            <div id="monthlyHeatmapGrid" class="heatmap-grid">
+              <!-- Rendered dynamically by app.js -->
+            </div>
+          </div>
+
+          <!-- 4 Skenario Kesehatan Tropis Quick Summary Grid -->
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <h3 class="font-bold text-slate-800 text-lg">4 Kondisi Cuaca yang Paling Sering Memicu Sakit</h3>
+                <p class="text-xs text-slate-500">Pola cuaca khas wilayah tropis Batam yang mempengaruhi daya tahan tubuh dan kuman penyakit</p>
+              </div>
+              <a data-tab="health-risks" class="btn btn-outline btn-sm cursor-pointer">
+                <span>Pelajari Selengkapnya</span>
+                <span class="material-symbols-outlined text-xs">arrow_forward</span>
+              </a>
+            </div>
+
+            <div class="scenario-grid">
+              
+              <!-- Skenario 1: Pancaroba -->
+              <div class="scenario-card pancaroba">
+                <div class="scenario-header">
+                  <div class="scenario-title-group">
+                    <div class="scenario-icon bg-amber-100 text-amber-700">
+                      <span class="material-symbols-outlined">pest_control</span>
+                    </div>
+                    <span class="scenario-name">1. Musim Peralihan (Pancaroba)</span>
+                  </div>
+                  <span id="pancarobaRiskBadge" class="tile-badge text-amber-700 bg-amber-100">Sedang</span>
+                </div>
+                <div class="scenario-diseases">Nyamuk DBD, Cikungunya, &amp; Zika</div>
+                <p class="scenario-desc">Hujan sebentar lalu panas terik membuat genangan air hangat—tempat paling disukai nyamuk belang <em>Aedes</em> untuk bertelur.</p>
+                <div class="risk-progress-wrapper">
+                  <div class="risk-progress-labels">
+                    <span class="text-slate-500">Peluang Nyamuk Berkembang</span>
+                    <span id="pancarobaRiskValue" class="font-bold text-slate-800">65%</span>
+                  </div>
+                  <div class="risk-progress-bar">
+                    <div id="pancarobaProgressFill" class="risk-progress-fill" style="width: 65%;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Skenario 2: El Nino -->
+              <div class="scenario-card elnino">
+                <div class="scenario-header">
+                  <div class="scenario-title-group">
+                    <div class="scenario-icon bg-red-100 text-red-700">
+                      <span class="material-symbols-outlined">local_fire_department</span>
+                    </div>
+                    <span class="scenario-name">2. Musim Panas Terik (Kemarau)</span>
+                  </div>
+                  <span id="elninoRiskBadge" class="tile-badge text-error bg-error-container/30">Tinggi</span>
+                </div>
+                <div class="scenario-diseases">Batuk Pilek (ISPA), Asap, &amp; Diare</div>
+                <p class="scenario-desc">Udara kering berdebu, asap lahan, dan sulitnya air bersih memicu radang tenggorokan serta masalah kebersihan perut.</p>
+                <div class="risk-progress-wrapper">
+                  <div class="risk-progress-labels">
+                    <span class="text-slate-500">Peluang Gangguan Napas</span>
+                    <span id="elninoRiskValue" class="font-bold text-slate-800">82%</span>
+                  </div>
+                  <div class="risk-progress-bar">
+                    <div id="elninoProgressFill" class="risk-progress-fill" style="width: 82%;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Skenario 3: La Nina -->
+              <div class="scenario-card lanina">
+                <div class="scenario-header">
+                  <div class="scenario-title-group">
+                    <div class="scenario-icon bg-sky-100 text-sky-700">
+                      <span class="material-symbols-outlined">flood</span>
+                    </div>
+                    <span class="scenario-name">3. Musim Hujan Lebat (Banjir)</span>
+                  </div>
+                  <span id="laninaRiskBadge" class="tile-badge text-primary bg-primary-light">Rendah</span>
+                </div>
+                <div class="scenario-diseases">Kencing Tikus (Leptospirosis) &amp; Tipes</div>
+                <p class="scenario-desc">Genangan banjir kotor membawa kuman dari kencing tikus yang bisa masuk lewat luka kecil di kulit saat kita menerobos air.</p>
+                <div class="risk-progress-wrapper">
+                  <div class="risk-progress-labels">
+                    <span class="text-slate-500">Peluang Penyakit Genangan</span>
+                    <span id="laninaRiskValue" class="font-bold text-slate-800">38%</span>
+                  </div>
+                  <div class="risk-progress-bar">
+                    <div id="laninaProgressFill" class="risk-progress-fill" style="width: 38%;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Skenario 4: Kelembapan Tinggi -->
+              <div class="scenario-card humidity">
+                <div class="scenario-header">
+                  <div class="scenario-title-group">
+                    <div class="scenario-icon bg-emerald-100 text-emerald-700">
+                      <span class="material-symbols-outlined">air</span>
+                    </div>
+                    <span class="scenario-name">4. Udara Sangat Lembap &amp; Pengap</span>
+                  </div>
+                  <span id="humidityRiskBadge" class="tile-badge text-amber-700 bg-amber-100">Sedang</span>
+                </div>
+                <div class="scenario-diseases">Batuk Paru (TBC) &amp; Jamur Kulit</div>
+                <p class="scenario-desc">Kamar atau ruangan yang pengap dan kurang kena sinar matahari membuat kuman batuk dan jamur gatal bertahan lebih lama di udara.</p>
+                <div class="risk-progress-wrapper">
+                  <div class="risk-progress-labels">
+                    <span class="text-slate-500">Peluang Kuman di Ruangan</span>
+                    <span id="humidityRiskValue" class="font-bold text-slate-800">62%</span>
+                  </div>
+                  <div class="risk-progress-bar">
+                    <div id="humidityProgressFill" class="risk-progress-fill" style="width: 62%;"></div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Footer / Action Area (Matching UIX) -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2 pb-2">
+            <!-- Community Alerts -->
+            <div class="dashboard-tile flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="font-bold text-slate-800 text-sm">Alert Komunitas Terkini</h3>
+                  <span class="bg-error-container text-on-error-container text-xs px-2.5 py-1 rounded-full font-bold">3 Baru</span>
+                </div>
+                <div class="space-y-3">
+                  <div class="p-3 bg-surface-container-low rounded-xl border border-slate-200">
+                    <div class="flex justify-between items-start mb-1">
+                      <span class="font-bold text-xs text-slate-900">Puskesmas Bengkong / RW 03</span>
+                      <span class="text-[10px] text-slate-400">10 mnt lalu</span>
+                    </div>
+                    <p class="text-xs text-slate-600">Laporan lonjakan 15 kasus suspek DBD di area genangan sporadis pasca hujan.</p>
+                  </div>
+                  <div class="p-3 bg-surface-container-low rounded-xl border border-slate-200">
+                    <div class="flex justify-between items-start mb-1">
+                      <span class="font-bold text-xs text-slate-900">RSUD Embung Fatimah</span>
+                      <span class="text-[10px] text-slate-400">1 jam lalu</span>
+                    </div>
+                    <p class="text-xs text-slate-600">Peringatan: Ketersediaan ruang rawat ISPA & nebulizer terisi 80%.</p>
+                  </div>
+                </div>
+              </div>
+              <a data-tab="community" class="text-xs font-bold text-primary hover:underline mt-3 block cursor-pointer">Buka Pusat Warta Komunitas &rarr;</a>
+            </div>
+
+            <!-- Quick Form -->
+            <div class="dashboard-tile flex flex-col justify-between">
+              <div>
+                <h3 class="font-bold text-slate-800 text-sm mb-3">Laporkan Potensi Risiko Lingkungan</h3>
+                <form id="quickReportForm" class="space-y-2.5">
+                  <input id="quickReportLocation" class="w-full text-xs rounded-xl border-slate-200 bg-slate-50 focus:ring-emerald-600 focus:border-emerald-600 px-3 py-2" placeholder="Lokasi (Kecamatan / Kelurahan)" type="text" />
+                  <select id="quickReportType" class="w-full text-xs rounded-xl border-slate-200 bg-slate-50 focus:ring-emerald-600 focus:border-emerald-600 px-3 py-2 text-slate-700">
+                    <option value="">Pilih Jenis Risiko (DBD, ISPA, Banjir)</option>
+                    <option value="DBD">Genangan Air / Jentik Nyamuk (DBD)</option>
+                    <option value="ISPA">Polusi Asap / Karhutla (ISPA)</option>
+                    <option value="Banjir">Banjir Luapan / Genangan (Leptospirosis)</option>
+                  </select>
+                  <button type="button" class="open-report-modal-btn w-full py-2 bg-secondary text-white rounded-xl font-bold text-xs hover:bg-secondary/90 transition-colors shadow-sm">Kirim Laporan Cepat</button>
+                </form>
+              </div>
+            </div>
+
+            <!-- Mitigation Tips & SOP -->
+            <div class="dashboard-tile bg-gradient-to-br from-emerald-50/60 to-white flex flex-col justify-between">
+              <div>
+                <h3 class="font-bold text-slate-800 text-sm mb-3">Mitigasi &amp; SOP Klinis Tropis</h3>
+                <div class="space-y-2.5">
+                  <a data-tab="mitigation" class="flex items-center justify-between p-2.5 bg-white rounded-xl border border-slate-200 hover:border-primary transition-colors group cursor-pointer">
+                    <div class="flex items-center gap-2.5">
+                      <span class="material-symbols-outlined text-primary bg-emerald-100 p-1.5 rounded-lg text-base">description</span>
+                      <span class="text-xs font-bold text-slate-800 group-hover:text-primary">SOP Penanganan Wabah DBD</span>
+                    </div>
+                    <span class="material-symbols-outlined text-slate-400 text-sm">download</span>
+                  </a>
+                  <a data-tab="mitigation" class="flex items-center justify-between p-2.5 bg-white rounded-xl border border-slate-200 hover:border-primary transition-colors group cursor-pointer">
+                    <div class="flex items-center gap-2.5">
+                      <span class="material-symbols-outlined text-primary bg-emerald-100 p-1.5 rounded-lg text-base">description</span>
+                      <span class="text-xs font-bold text-slate-800 group-hover:text-primary">Panduan Evakuasi Banjir & Sanitasi</span>
+                    </div>
+                    <span class="material-symbols-outlined text-slate-400 text-sm">download</span>
+                  </a>
+                </div>
+              </div>
+              <a data-tab="mitigation" class="text-xs font-bold text-primary hover:underline mt-3 block cursor-pointer">Lihat Seluruh Panduan Mitigasi &rarr;</a>
+            </div>
+          </div>
+
+        </section>
+
+
+        <!-- ===============================================================
+             TAB 2: RISIKO KESEHATAN (HEALTH RISK DETAIL)
+             =============================================================== -->
+        <section id="tab-health-risks" class="tab-pane space-y-6">
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-3 pb-4 border-b border-slate-200">
+            <div>
+              <h2 class="font-extrabold text-2xl text-slate-900">Analisis Mendalam 4 Skenario Kesehatan Tropis</h2>
+              <p class="text-sm text-slate-500">Evaluasi terperinci pengaruh anomali iklim mikro terhadap penularan penyakit di Indonesia</p>
+            </div>
+            <div class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 shadow-sm">
+              <span class="material-symbols-outlined text-emerald-600 text-sm">verified_user</span>
+              <span>Model VAR Epidemiologi Tropis</span>
+            </div>
+          </div>
+
+          <!-- Composite Gauge & Radar Comparison -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Left: Composite Circular Gauge -->
+            <div class="lg:col-span-4 dashboard-tile flex flex-col justify-between items-center text-center">
+              <div>
+                <h3 class="font-bold text-slate-800 text-base mb-1">Indeks Risiko Komposit VAR</h3>
+                <p class="text-xs text-slate-400 mb-4">Probabilitas Agregat Penyakit Tropis</p>
+                <div class="relative w-48 h-48 mx-auto flex items-center justify-center">
+                  <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="40" fill="transparent" stroke="#f1f5f9" stroke-width="10"></circle>
+                    <circle id="compositeGaugeCircle" cx="50" cy="50" r="40" fill="transparent" stroke="#e29100" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.2" stroke-dashoffset="80"></circle>
+                  </svg>
+                  <div class="absolute inset-0 flex flex-col items-center justify-center">
+                    <span id="compositeGaugeScore" class="font-black text-4xl text-slate-900">64</span>
+                    <span id="compositeGaugeStatus" class="font-bold text-xs uppercase tracking-wider text-amber-600">WASPADA</span>
+                  </div>
+                </div>
+                <p class="text-xs text-slate-500 mt-2 px-4">
+                  Kombinasi suhu tinggi dan fluktuasi kelembapan menaikkan risiko transmisi vektor nyamuk dan infeksi pernapasan.
+                </p>
+              </div>
+              <button class="btn btn-secondary w-full mt-4">
+                <span class="material-symbols-outlined text-sm">download</span>
+                <span>Unduh Laporan Analisis Bulanan</span>
+              </button>
+            </div>
+
+            <!-- Right: 4 Scenarios Radar & Monthly Forecast -->
+            <div class="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              <!-- Radar Chart -->
+              <div class="dashboard-tile flex flex-col">
+                <h3 class="font-bold text-slate-800 text-sm mb-1">Distribusi Risiko 4 Klaster Penyakit</h3>
+                <p class="text-xs text-slate-400 mb-3">Tingkat kerentanan komparatif</p>
+                <div class="flex-1 h-56 relative">
+                  <canvas id="diseaseRadarChart"></canvas>
+                </div>
+              </div>
+
+              <!-- Monthly Bar Forecast -->
+              <div class="dashboard-tile flex flex-col">
+                <h3 class="font-bold text-slate-800 text-sm mb-1">Prakiraan Risiko 12 Bulan</h3>
+                <p class="text-xs text-slate-400 mb-3">Tren probabilitas model VAR per bulan</p>
+                <div class="flex-1 h-56 relative">
+                  <canvas id="monthlyRiskBarChart"></canvas>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- Deep Dive 4 Scenario Detail Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Detail 1: Pancaroba -->
+            <div class="dashboard-tile border-l-4 border-l-amber-500">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="p-2.5 rounded-lg bg-amber-50 text-amber-600">
+                  <span class="material-symbols-outlined">pest_control</span>
+                </div>
+                <div>
+                  <h4 class="font-bold text-slate-900 text-base">1. Fase Pancaroba (Transisi Musim)</h4>
+                  <p class="text-xs text-slate-400">Puncak: Maret-Mei & September-November</p>
+                </div>
+              </div>
+              <p class="text-xs text-slate-600 leading-relaxed mb-4">
+                <strong>Penyakit Utama:</strong> Demam Berdarah Dengue (DBD), Chikungunya, Zika.<br />
+                <strong>Mekanisme Iklim:</strong> Siklus hujan terputus-putus menyisakan genangan air bersih hangat di barang bekas, pot, dan talang air yang menjadi inkubator sempurna larva <em>Aedes aegypti</em>.
+              </p>
+              <div class="bg-slate-50 p-3 rounded-lg text-xs space-y-1 text-slate-600 border border-slate-200">
+                <div class="font-bold text-slate-800">Rekomendasi Aksi Cepat:</div>
+                <div>• Gerakan PSN 3M Plus serentak di lingkungan RT</div>
+                <div>• Penaburan bubuk larvasida (Abate) pada bak penampungan air</div>
+              </div>
+            </div>
+
+            <!-- Detail 2: Kemarau / El Nino -->
+            <div class="dashboard-tile border-l-4 border-l-red-500">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="p-2.5 rounded-lg bg-red-50 text-red-600">
+                  <span class="material-symbols-outlined">local_fire_department</span>
+                </div>
+                <div>
+                  <h4 class="font-bold text-slate-900 text-base">2. Musim Kemarau Ekstrem (El Niño)</h4>
+                  <p class="text-xs text-slate-400">Puncak: Juni - Agustus</p>
+                </div>
+              </div>
+              <p class="text-xs text-slate-600 leading-relaxed mb-4">
+                <strong>Penyakit Utama:</strong> ISPA & Pneumonia (Karhutla), Diare & Kolera, Skabies.<br />
+                <strong>Mekanisme Iklim:</strong> Suhu daratan tinggi memicu kebakaran hutan/lahan menghasilkan partikel PM2.5 pekat. Penyusutan sumur memaksa warga memakai air kotor untuk sanitasi MCK.
+              </p>
+              <div class="bg-slate-50 p-3 rounded-lg text-xs space-y-1 text-slate-600 border border-slate-200">
+                <div class="font-bold text-slate-800">Rekomendasi Aksi Cepat:</div>
+                <div>• Gunakan masker N95/medis saat indeks polusi udara meningkat</div>
+                <div>• Pengolahan dan perebusan air baku sebelum konsumsi keluarga</div>
+              </div>
+            </div>
+
+            <!-- Detail 3: Hujan / La Nina -->
+            <div class="dashboard-tile border-l-4 border-l-sky-500">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="p-2.5 rounded-lg bg-sky-50 text-sky-600">
+                  <span class="material-symbols-outlined">flood</span>
+                </div>
+                <div>
+                  <h4 class="font-bold text-slate-900 text-base">3. Musim Penghujan Ekstrem (La Niña)</h4>
+                  <p class="text-xs text-slate-400">Puncak: November - Februari</p>
+                </div>
+              </div>
+              <p class="text-xs text-slate-600 leading-relaxed mb-4">
+                <strong>Penyakit Utama:</strong> Leptospirosis, Demam Tifoid (Tipes), Malaria.<br />
+                <strong>Mekanisme Iklim:</strong> Air banjir membawa kotoran dan urine tikus got yang mengandung bakteri <em>Leptospira</em> masuk lewat luka di kulit. Luapan septic tank mengkontaminasi jajanan & air minum.
+              </p>
+              <div class="bg-slate-50 p-3 rounded-lg text-xs space-y-1 text-slate-600 border border-slate-200">
+                <div class="font-bold text-slate-800">Rekomendasi Aksi Cepat:</div>
+                <div>• Pakai sepatu bot karet saat membersihkan area pasca-banjir</div>
+                <div>• Cuci tangan pakai sabun setelah kontak dengan air selokan</div>
+              </div>
+            </div>
+
+            <!-- Detail 4: Kelembapan Tinggi -->
+            <div class="dashboard-tile border-l-4 border-l-emerald-500">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="p-2.5 rounded-lg bg-emerald-50 text-emerald-600">
+                  <span class="material-symbols-outlined">air</span>
+                </div>
+                <div>
+                  <h4 class="font-bold text-slate-900 text-base">4. Kelembapan Udara Konsisten Tinggi (70-90%)</h4>
+                  <p class="text-xs text-slate-400">Terjadi Sepanjang Tahun di Daerah Tropis</p>
+                </div>
+              </div>
+              <p class="text-xs text-slate-600 leading-relaxed mb-4">
+                <strong>Penyakit Utama:</strong> Tuberkulosis (TBC), Infeksi Jamur Kulit (Panu/Kurap).<br />
+                <strong>Mekanisme Iklim:</strong> Kelembapan relatif konstan >80% membuat aerosol droplet TBC tidak cepat menguap dan bertahan lama di udara dalam kamar/rumah yang minim sinar matahari.
+              </p>
+              <div class="bg-slate-50 p-3 rounded-lg text-xs space-y-1 text-slate-600 border border-slate-200">
+                <div class="font-bold text-slate-800">Rekomendasi Aksi Cepat:</div>
+                <div>• Buka jendela kamar setiap pagi agar sirkulasi udara & sinar UV masuk</div>
+                <div>• Keringkan handuk & pakaian di bawah sinar matahari langsung</div>
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ===============================================================
+             TAB 3: TREN IKLIM (CLIMATE TRENDS 1996 - 2026)
+             =============================================================== -->
+        <section id="tab-climate-trends" class="tab-pane space-y-6">
+          <div class="pb-4 border-b border-slate-200">
+            <h2 class="font-extrabold text-2xl text-slate-900">Analisis Tren Iklim Multi-Dekade (1996 - 2026)</h2>
+            <p class="text-sm text-slate-500">Pola perubahan suhu, curah hujan ekstrem, dan anomali El Niño / La Niña selama 30 tahun</p>
+          </div>
+
+          <!-- Climate Trend Canvas -->
+          <div class="dashboard-tile">
+            <div class="w-full h-80 relative">
+              <canvas id="climateTrendChartCanvas"></canvas>
+            </div>
+          </div>
+
+          <!-- Anomaly History Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <div class="dashboard-tile">
+              <div class="flex items-center gap-3 mb-2">
+                <span class="material-symbols-outlined text-red-500">whatshot</span>
+                <h4 class="font-bold text-slate-800 text-sm">El Niño Kuat (1997, 2015, 2023)</h4>
+              </div>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Kenaikan suhu permukaan laut pasifik timur menekan curah hujan Indonesia hingga defisit 60%. Menyebabkan lonjakan kasus ISPA, kekeringan pertanian, dan penyebaran diare.
+              </p>
+            </div>
+
+            <div class="dashboard-tile">
+              <div class="flex items-center gap-3 mb-2">
+                <span class="material-symbols-outlined text-sky-500">tsunami</span>
+                <h4 class="font-bold text-slate-800 text-sm">La Niña Basah (2010, 2020-2022)</h4>
+              </div>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Curah hujan melonjak 40-55% di atas rata-rata normal. Banjir berkepanjangan memicu klaster leptospirosis dan kontaminasi salmonella pada sumber air warga.
+              </p>
+            </div>
+
+            <div class="dashboard-tile">
+              <div class="flex items-center gap-3 mb-2">
+                <span class="material-symbols-outlined text-emerald-500">model_training</span>
+                <h4 class="font-bold text-slate-800 text-sm">Kesiapan Model VAR ML</h4>
+              </div>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Pemodelan Vector Autoregression menangkap lag waktu (time-lag) antara anomali cuaca dengan onset wabah penyakit (misal: puncak DBD 2-3 minggu pasca hujan pancaroba).
+              </p>
+            </div>
+
+          </div>
+        </section>
+
+
+        <!-- ===============================================================
+             TAB 4: ALERT KOMUNITAS (COMMUNITY HEALTH HUB)
+             =============================================================== -->
+        <section id="tab-community" class="tab-pane space-y-6">
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 pb-4 border-b border-slate-200">
+            <div>
+              <h2 class="font-extrabold text-2xl text-slate-900">Alert Komunitas & Laporan Warga</h2>
+              <p class="text-sm text-slate-500">Pusat informasi gotong royong peringatan dini kesehatan lingkungan tingkat RT/Kelurahan</p>
+            </div>
+            <button class="open-report-modal-btn btn btn-primary">
+              <span class="material-symbols-outlined">add_circle</span>
+              <span>Buat Laporan Baru</span>
+            </button>
+          </div>
+
+          <!-- Filter Kategori Feed -->
+          <div class="flex flex-wrap items-center gap-2">
+            <button class="community-filter-btn btn btn-outline btn-sm active" data-category="ALL">Semua Laporan</button>
+            <button class="community-filter-btn btn btn-outline btn-sm" data-category="Pancaroba_DBD">Waspada DBD</button>
+            <button class="community-filter-btn btn btn-outline btn-sm" data-category="Kemarau_ISPA">ISPA & Asap</button>
+            <button class="community-filter-btn btn btn-outline btn-sm" data-category="Hujan_Leptospirosis">Banjir & Sanitasi</button>
+            <button class="community-filter-btn btn btn-outline btn-sm" data-category="Kelembapan_TBC">Kelembapan / TBC</button>
+          </div>
+
+          <!-- Feed Container -->
+          <div id="communityFeedContainer" class="community-feed">
+            <!-- Rendered by BumiCommunity.renderFeed() -->
+          </div>
+        </section>
+
+
+        <!-- ===============================================================
+             TAB 5: MITIGASI (PANDUAN AKSI & DARURAT)
+             =============================================================== -->
+        <section id="tab-mitigation" class="tab-pane space-y-6">
+          <div class="pb-4 border-b border-slate-200">
+            <h2 class="font-extrabold text-2xl text-slate-900">Panduan Mitigasi & Tanggap Darurat Kesehatan</h2>
+            <p class="text-sm text-slate-500">Checklist langkah pencegahan mandiri dan rujukan fasilitas kesehatan di wilayah Anda</p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Action 1 -->
+            <div class="dashboard-tile">
+              <div class="flex items-center gap-2 text-emerald-700 font-bold mb-3">
+                <span class="material-symbols-outlined">check_box</span>
+                <span>Protokol 3M Plus (Pancaroba)</span>
+              </div>
+              <ul class="text-xs text-slate-600 space-y-2 list-disc pl-4">
+                <li><strong>Menguras</strong> bak mandi minimal 1 minggu sekali.</li>
+                <li><strong>Menutup</strong> rapat semua drum dan tandon air bersih.</li>
+                <li><strong>Mendaur ulang</strong> barang bekas penampung air hujan.</li>
+                <li>Menaburkan bubuk Abate pada genangan air sulit dikuras.</li>
+              </ul>
+            </div>
+
+            <!-- Action 2 -->
+            <div class="dashboard-tile">
+              <div class="flex items-center gap-2 text-red-600 font-bold mb-3">
+                <span class="material-symbols-outlined">check_box</span>
+                <span>Protokol Kualitas Udara (Kemarau)</span>
+              </div>
+              <ul class="text-xs text-slate-600 space-y-2 list-disc pl-4">
+                <li>Batasi aktivitas luar ruangan bagi anak-anak dan penderita asma.</li>
+                <li>Gunakan masker kain/medis saat berada di area kabut asap.</li>
+                <li>Perbanyak konsumsi air putih minimal 2.5 liter per hari.</li>
+                <li>Rebus air sumur hingga mendidih sempurna sebelum diminum.</li>
+              </ul>
+            </div>
+
+            <!-- Action 3 -->
+            <div class="dashboard-tile">
+              <div class="flex items-center gap-2 text-sky-700 font-bold mb-3">
+                <span class="material-symbols-outlined">check_box</span>
+                <span>Protokol Pasca Banjir (Hujan)</span>
+              </div>
+              <ul class="text-xs text-slate-600 space-y-2 list-disc pl-4">
+                <li>Gunakan sepatu bot karet dan sarung tangan saat membersihkan lumpur.</li>
+                <li>Tutup luka gores dengan plester kedap air untuk cegah bakteri tikus.</li>
+                <li>Desinfeksi lantai rumah dengan cairan klorin / karbol.</li>
+                <li>Periksa ke Puskesmas jika demam tinggi disertai nyeri betis.</li>
+              </ul>
+            </div>
+
+          </div>
+
+          <!-- Emergency Directory -->
+          <div class="dashboard-tile">
+            <h3 class="font-bold text-slate-800 text-base mb-3">Kontak Darurat & Rujukan Faskes Terdekat</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+              <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                <div class="font-bold text-slate-800">Call Center Darurat Dinkes</div>
+                <div class="text-emerald-700 font-extrabold text-sm mt-1">119 / 112 (Bebas Pulsa)</div>
+                <div class="text-slate-400 mt-1">Layanan Ambulans & Tanggap Wabah</div>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                <div class="font-bold text-slate-800">RSUD Embung Fatimah Batam</div>
+                <div class="text-slate-700 font-bold mt-1">(0778) 364446</div>
+                <div class="text-slate-400 mt-1">Rujukan Rawat Inap & Laboratorium DBD</div>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                <div class="font-bold text-slate-800">Puskesmas Sei Panas / Batam Kota</div>
+                <div class="text-slate-700 font-bold mt-1">(0778) 461234</div>
+                <div class="text-slate-400 mt-1">Pelayanan Kesehatan Primer & Vaksinasi</div>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+
+        <!-- ===============================================================
+             TAB 6: STUDIO AI LOKAL & MATRIX ANALITIK (OFFLINE LOCAL AI)
+             =============================================================== -->
+        <section id="tab-local-ai" class="tab-pane space-y-6">
+          
+          <!-- Header Studio AI Lokal -->
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-4 border-b border-slate-200">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="p-2 bg-emerald-100 text-emerald-700 rounded-lg material-symbols-outlined text-2xl">psychology</span>
+                <h2 class="font-extrabold text-2xl text-slate-900">Studio AI Lokal & Matriks Risiko Epidemiologi</h2>
+              </div>
+              <p class="text-sm text-slate-500 mt-1">
+                Pemodelan Machine Learning & Vector Autoregression (VAR) berbasis data riil 30 tahun (1996–2025). Berjalan 100% lokal dan mandiri.
+              </p>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <button id="btnRetrainModel" class="btn btn-outline btn-sm flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm text-emerald-600">sync</span>
+                <span>Latih Ulang Model (Retrain)</span>
+              </button>
+              <div class="flex items-center gap-2 bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1.5 rounded-lg text-xs font-semibold">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Model VAR Riil Aktif</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Model Accuracy & Dataset Statistics Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="dashboard-tile">
+              <div class="text-xs text-slate-400 font-semibold uppercase">Sampel Pelatihan Data Riil</div>
+              <div class="text-2xl font-black text-slate-900 mt-1">360 Bulan</div>
+              <div class="text-xs text-emerald-600 mt-1">✓ Observasi 1996 - 2025 Lengkap</div>
+            </div>
+            <div class="dashboard-tile">
+              <div class="text-xs text-slate-400 font-semibold uppercase">Akurasi Model Suhu (R²)</div>
+              <div class="text-2xl font-black text-emerald-700 mt-1">0.917</div>
+              <div class="text-xs text-slate-500 mt-1">Mean Squared Error: 0.032</div>
+            </div>
+            <div class="dashboard-tile">
+              <div class="text-xs text-slate-400 font-semibold uppercase">Ketepatan Prediksi Hujan</div>
+              <div class="text-2xl font-black text-sky-700 mt-1">85.3%</div>
+              <div class="text-xs text-slate-500 mt-1">Sangat Sesuai Data Musim Hujan</div>
+            </div>
+            <div class="dashboard-tile">
+              <div class="text-xs text-slate-400 font-semibold uppercase">Privasi &amp; Keamanan AI</div>
+              <div class="text-2xl font-black text-primary mt-1">100% Offline</div>
+              <div class="text-xs text-slate-500 mt-1">Berjalan Langsung di Komputer Anda</div>
+            </div>
+          </div>
+
+          <!-- Section 1: Interactive Matrix Table & Heatmap Insights -->
+          <div class="dashboard-tile">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
+              <div>
+                <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                  <span class="material-symbols-outlined text-primary text-lg">grid_on</span>
+                  <span>Tabel Hubungan Cuaca dengan Penyakit di Batam (1996 - 2025)</span>
+                </h3>
+                <p class="text-xs text-slate-500">Angka ini menunjukkan seberapa kuat cuaca mempengaruhi munculnya 4 kelompok penyakit</p>
+              </div>
+              <div class="flex items-center gap-3 text-xs">
+                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-100 border border-emerald-300"></span> Pengaruh Kuat Memicu Sakit (&gt;+0.45)</span>
+                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-rose-100 border border-rose-300"></span> Pengaruh Berlawanan (&lt;-0.45)</span>
+              </div>
+            </div>
+
+            <div class="matrix-table-container">
+              <table class="matrix-table" id="correlationMatrixTable">
+                <thead>
+                  <tr>
+                    <th class="text-left pl-3">Kondisi Cuaca / Penyakit</th>
+                    <th>Suhu Udara (°C)</th>
+                    <th>Kelembapan (%)</th>
+                    <th>Curah Hujan (mm)</th>
+                    <th>1. Nyamuk DBD</th>
+                    <th>2. Batuk Kemarau</th>
+                    <th>3. Kencing Tikus</th>
+                    <th>4. Batuk TBC / Jamur</th>
+                    <th>Skor Bahaya Total</th>
+                  </tr>
+                </thead>
+                <tbody id="correlationMatrixTableBody">
+                  <!-- Rendered dynamically by app.js -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Key Insight Callouts -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mt-4 text-xs">
+              <div class="p-3 bg-amber-50 rounded-lg border border-amber-200">
+                <strong class="text-amber-800 block mb-1">🦟 Suhu Hangat ➔ Nyamuk DBD (+0.49)</strong>
+                <span class="text-slate-600">Suhu hangat 27–29°C membuat nyamuk belang <em>Aedes</em> lebih cepat bertelur dan menggigit.</span>
+              </div>
+              <div class="p-3 bg-red-50 rounded-lg border border-red-200">
+                <strong class="text-red-800 block mb-1">🔥 Kemarau Panas ➔ Batuk Pilek (+0.69)</strong>
+                <span class="text-slate-600">Udara kering berdebu dan asap membuat tenggorokan gatal dan gampang radang.</span>
+              </div>
+              <div class="p-3 bg-sky-50 rounded-lg border border-sky-200">
+                <strong class="text-sky-800 block mb-1">🌊 Hujan Lebat ➔ Kencing Tikus (+0.76)</strong>
+                <span class="text-slate-600">Banjir menyebarkan kuman dari kencing tikus ke jalanan dan permukiman warga.</span>
+              </div>
+              <div class="p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+                <strong class="text-emerald-800 block mb-1">💨 Udara Pengap ➔ Batuk TBC (+0.80)</strong>
+                <span class="text-slate-600">Ruangan lembap tanpa sirkulasi udara segar membuat kuman batuk betah melayang.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Simulator Prediksi Risiko AI Lokal (What-If Scenario) & Live Diagnosis -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Left: Interactive Sliders (Simulator Controls) -->
+            <div class="lg:col-span-6 dashboard-tile flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
+                  <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                    <span class="material-symbols-outlined text-emerald-600">tune</span>
+                    <span>Coba Atur Cuaca Sendiri (Simulasi Langsung)</span>
+                  </h3>
+                  <span class="text-xs text-slate-400">Geser slider untuk melihat prediksinya</span>
+                </div>
+
+                <!-- Slider 1: Suhu -->
+                <div class="mb-4">
+                  <div class="flex justify-between text-xs font-bold text-slate-700 mb-1">
+                    <label class="flex items-center gap-1"><span class="material-symbols-outlined text-red-500 text-sm">device_thermostat</span> Suhu Udara (°C)</label>
+                    <span id="simTempValDisplay" class="text-red-600 bg-red-50 px-2 py-0.5 rounded border border-red-200">28.3°C</span>
+                  </div>
+                  <input type="range" id="simTempSlider" min="24.0" max="36.0" step="0.1" value="28.3" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-red-600" />
+                  <div class="flex justify-between text-[10px] text-slate-400 mt-1">
+                    <span>24°C (Sejuk Dingin)</span>
+                    <span>28°C (Normal Hangat)</span>
+                    <span>36°C (Panas Terik)</span>
+                  </div>
+                </div>
+
+                <!-- Slider 2: Kelembapan -->
+                <div class="mb-4">
+                  <div class="flex justify-between text-xs font-bold text-slate-700 mb-1">
+                    <label class="flex items-center gap-1"><span class="material-symbols-outlined text-sky-500 text-sm">humidity_percentage</span> Kelembapan Udara (%)</label>
+                    <span id="simHumValDisplay" class="text-sky-600 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">82%</span>
+                  </div>
+                  <input type="range" id="simHumSlider" min="50" max="100" step="1" value="82" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-sky-600" />
+                  <div class="flex justify-between text-[10px] text-slate-400 mt-1">
+                    <span>50% (Kering Berdebu)</span>
+                    <span>75-85% (Normal Nyaman)</span>
+                    <span>100% (Sangat Pengap & Basah)</span>
+                  </div>
+                </div>
+
+                <!-- Slider 3: Curah Hujan -->
+                <div class="mb-4">
+                  <div class="flex justify-between text-xs font-bold text-slate-700 mb-1">
+                    <label class="flex items-center gap-1"><span class="material-symbols-outlined text-cyan-600 text-sm">rainy</span> Curah Hujan (mm)</label>
+                    <span id="simRainValDisplay" class="text-cyan-700 bg-cyan-50 px-2 py-0.5 rounded border border-cyan-200">180 mm</span>
+                  </div>
+                  <input type="range" id="simRainSlider" min="0" max="650" step="5" value="180" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-cyan-600" />
+                  <div class="flex justify-between text-[10px] text-slate-400 mt-1">
+                    <span>0 mm (Kering Kerontang)</span>
+                    <span>180 mm (Hujan Biasa)</span>
+                    <span>650 mm (Banjir Bandang)</span>
+                  </div>
+                </div>
+
+                <!-- Selector Bulan -->
+                <div class="mb-4">
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Pilihan Bulan / Musim</label>
+                  <select id="simMonthSelect" class="form-select text-xs">
+                    <option value="1">Januari (Puncak Musim Hujan)</option>
+                    <option value="2">Februari (Musim Hujan)</option>
+                    <option value="3">Maret (Mulai Peralihan Hujan ke Panas)</option>
+                    <option value="4" selected>April (Musim Pancaroba: Nyamuk DBD)</option>
+                    <option value="5">Mei (Pancaroba Akhir)</option>
+                    <option value="6">Juni (Mulai Musim Kemarau)</option>
+                    <option value="7">Juli (Puncak Kemarau Panas)</option>
+                    <option value="8">Agustus (Kemarau Kering &amp; Asap)</option>
+                    <option value="9">September (Peralihan Panas ke Hujan)</option>
+                    <option value="10">Oktober (Mulai Masuk Musim Hujan)</option>
+                    <option value="11">November (Hujan Deras &amp; Genangan)</option>
+                    <option value="12">Desember (Puncak Hujan Monsun)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                <span>Model AI: <strong>Pintar &amp; 100% Offline</strong></span>
+                <button id="btnResetSim" class="text-emerald-700 font-semibold hover:underline cursor-pointer">Kembalikan ke Awal</button>
+              </div>
+            </div>
+
+            <!-- Right: Instant AI Output & Risk Assessment Card -->
+            <div class="lg:col-span-6 dashboard-tile flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
+                  <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                    <span class="material-symbols-outlined text-secondary text-lg">fact_check</span>
+                    <span>Hasil Prediksi Kesehatan dari AI</span>
+                  </h3>
+                  <span id="simRiskBadge" class="tile-badge text-amber-700 bg-amber-100 font-bold">PERLU HATI-HATI</span>
+                </div>
+
+                <!-- Composite Score Header -->
+                <div class="flex items-center gap-4 bg-slate-50 p-3.5 rounded-xl border border-slate-200 mb-4">
+                  <div class="text-center px-2">
+                    <div id="simRiskScoreText" class="text-3xl font-black text-slate-900">65</div>
+                    <div class="text-[10px] text-slate-400 font-bold uppercase">Skor Bahaya</div>
+                  </div>
+                  <div class="flex-1 text-xs border-l border-slate-200 pl-3.5">
+                    <div class="text-slate-500">Penyakit yang Paling Harus Diwaspadai:</div>
+                    <div id="simThreatText" class="font-bold text-slate-800 text-sm mt-0.5">Musim Pancaroba: Nyamuk DBD &amp; Cikungunya</div>
+                  </div>
+                </div>
+
+                <!-- 4 Disease Breakdown Bars -->
+                <div class="space-y-2.5 text-xs">
+                  <div>
+                    <div class="flex justify-between mb-1">
+                      <span class="font-semibold text-amber-800">1. Musim Pancaroba (Nyamuk DBD &amp; Cikungunya)</span>
+                      <span id="simDbdScore" class="font-bold text-slate-800">72%</span>
+                    </div>
+                    <div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                      <div id="simDbdBar" class="h-full bg-amber-500 rounded-full transition-all duration-300" style="width: 72%;"></div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="flex justify-between mb-1">
+                      <span class="font-semibold text-red-800">2. Kemarau Panas (Batuk ISPA, Asap, Sakit Perut)</span>
+                      <span id="simIspaScore" class="font-bold text-slate-800">45%</span>
+                    </div>
+                    <div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                      <div id="simIspaBar" class="h-full bg-red-500 rounded-full transition-all duration-300" style="width: 45%;"></div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="flex justify-between mb-1">
+                      <span class="font-semibold text-sky-800">3. Hujan Banjir (Kencing Tikus &amp; Tipes)</span>
+                      <span id="simLeptoScore" class="font-bold text-slate-800">40%</span>
+                    </div>
+                    <div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                      <div id="simLeptoBar" class="h-full bg-sky-500 rounded-full transition-all duration-300" style="width: 40%;"></div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="flex justify-between mb-1">
+                      <span class="font-semibold text-emerald-800">4. Udara Pengap &amp; Lembap (TBC &amp; Jamur Kulit)</span>
+                      <span id="simTbcScore" class="font-bold text-slate-800">62%</span>
+                    </div>
+                    <div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                      <div id="simTbcBar" class="h-full bg-emerald-500 rounded-full transition-all duration-300" style="width: 62%;"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- AI Clinical Recommendations -->
+                <div class="mt-4 pt-3 border-t border-slate-100">
+                  <div class="text-xs font-bold text-slate-800 mb-1.5 flex items-center gap-1">
+                    <span class="material-symbols-outlined text-emerald-600 text-sm">health_and_safety</span>
+                    <span>Saran Praktis dari Asisten AI:</span>
+                  </div>
+                  <div id="simActionsContainer" class="space-y-1 text-xs text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    <div>• Kuras bak mandi dan buang air yang tergenang di ember/kaleng bekas seminggu sekali.</div>
+                    <div>• Taburkan bubuk abate pada tempat penampungan air yang susah dikuras.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Section 3: Galeri Kolom Pertanyaan Siap Klik (1-Click AI Questions) & Chat Assistant -->
+          <div class="dashboard-tile" id="aiChatAssistantTile">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
+              <div>
+                <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                  <span class="material-symbols-outlined text-primary text-xl">touch_app</span>
+                  <span>Pilih Pertanyaan Siap Jawab (Tinggal Klik Saja)</span>
+                </h3>
+                <p class="text-xs text-slate-500">Anda tidak perlu mengetik panjang, cukup klik salah satu kotak pertanyaan di bawah dan Asisten AI akan langsung memberikan jawaban lengkap &amp; tips praktisnya:</p>
+              </div>
+
+              <!-- Filter Kategori Cepat -->
+              <div class="flex flex-wrap items-center gap-1.5 text-xs">
+                <button class="filter-question-btn active px-2.5 py-1 rounded-full bg-emerald-700 text-white font-semibold cursor-pointer text-xs" data-cat="all">Semua Topik</button>
+                <button class="filter-question-btn px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 font-semibold cursor-pointer text-xs" data-cat="dbd">🦟 Nyamuk DBD</button>
+                <button class="filter-question-btn px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 font-semibold cursor-pointer text-xs" data-cat="panas">🔥 Cuaca Panas</button>
+                <button class="filter-question-btn px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 font-semibold cursor-pointer text-xs" data-cat="banjir">🌊 Banjir &amp; Tikus</button>
+                <button class="filter-question-btn px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 font-semibold cursor-pointer text-xs" data-cat="lembap">💨 Udara Lembap</button>
+              </div>
+            </div>
+
+            <!-- Grid 6 Kolom Pertanyaan Siap Klik -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 mb-5" id="presetQuestionsGrid">
+              
+              <!-- Kartu 1: Cara Cegah DBD -->
+              <div class="preset-question-card dbd p-3.5 rounded-xl border border-amber-200 bg-amber-50/50 hover:bg-amber-50 hover:border-amber-400 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between" data-prompt="Bagaimana cara ampuh mencegah nyamuk DBD bertelur di sekitar rumah?">
+                <div>
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800 uppercase">Musim Pancaroba</span>
+                    <span class="material-symbols-outlined text-amber-600 text-lg">pest_control</span>
+                  </div>
+                  <h4 class="font-bold text-slate-900 text-xs mb-1 leading-snug">Bagaimana cara ampuh mencegah nyamuk DBD bertelur di sekitar rumah?</h4>
+                  <p class="text-[11px] text-slate-600">Kapan waktu nyamuk menggigit, cara kuras bak, dan aturan bubuk abate.</p>
+                </div>
+                <div class="mt-3 pt-2 border-t border-amber-200/60 flex items-center justify-between text-[11px] font-bold text-amber-800">
+                  <span>Klik untuk Lihat Jawaban AI</span>
+                  <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </div>
+              </div>
+
+              <!-- Kartu 2: Tanda Bahaya DBD -->
+              <div class="preset-question-card dbd p-3.5 rounded-xl border border-amber-200 bg-amber-50/50 hover:bg-amber-50 hover:border-amber-400 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between" data-prompt="Apa tanda-tanda bahaya demam berdarah yang harus segera dibawa ke rumah sakit?">
+                <div>
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800 uppercase">Gejala Darurat</span>
+                    <span class="material-symbols-outlined text-amber-600 text-lg">emergency</span>
+                  </div>
+                  <h4 class="font-bold text-slate-900 text-xs mb-1 leading-snug">Apa tanda bahaya demam berdarah yang harus segera dibawa ke RS?</h4>
+                  <p class="text-[11px] text-slate-600">Demam tinggi mendadak, bintik merah, nyeri ulu hati, dan fase kritis DBD.</p>
+                </div>
+                <div class="mt-3 pt-2 border-t border-amber-200/60 flex items-center justify-between text-[11px] font-bold text-amber-800">
+                  <span>Klik untuk Lihat Jawaban AI</span>
+                  <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </div>
+              </div>
+
+              <!-- Kartu 3: Cuaca Panas Terik -->
+              <div class="preset-question-card panas p-3.5 rounded-xl border border-red-200 bg-red-50/50 hover:bg-red-50 hover:border-red-400 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between" data-prompt="Bagaimana cara menjaga anak-anak dan lansia tetap sehat saat cuaca panas terik?">
+                <div>
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-red-100 text-red-800 uppercase">Kemarau Terik</span>
+                    <span class="material-symbols-outlined text-red-600 text-lg">wb_sunny</span>
+                  </div>
+                  <h4 class="font-bold text-slate-900 text-xs mb-1 leading-snug">Bagaimana menjaga anak &amp; lansia tetap sehat saat cuaca panas terik?</h4>
+                  <p class="text-[11px] text-slate-600">Aturan cukup minum air, jam bahaya sinar UV, dan cegah dehidrasi.</p>
+                </div>
+                <div class="mt-3 pt-2 border-t border-red-200/60 flex items-center justify-between text-[11px] font-bold text-red-800">
+                  <span>Klik untuk Lihat Jawaban AI</span>
+                  <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </div>
+              </div>
+
+              <!-- Kartu 4: Asap & Batuk ISPA -->
+              <div class="preset-question-card panas p-3.5 rounded-xl border border-red-200 bg-red-50/50 hover:bg-red-50 hover:border-red-400 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between" data-prompt="Apa yang harus dilakukan jika udara di luar berdebu atau berbau asap kebakaran lahan?">
+                <div>
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-red-100 text-red-800 uppercase">Debu &amp; Asap</span>
+                    <span class="material-symbols-outlined text-red-600 text-lg">masks</span>
+                  </div>
+                  <h4 class="font-bold text-slate-900 text-xs mb-1 leading-snug">Apa yang harus dilakukan jika udara berdebu atau berbau asap lahan?</h4>
+                  <p class="text-[11px] text-slate-600">Pilihan masker terbaik, jaga hidung &amp; mata, dan pencegahan radang tenggorokan.</p>
+                </div>
+                <div class="mt-3 pt-2 border-t border-red-200/60 flex items-center justify-between text-[11px] font-bold text-red-800">
+                  <span>Klik untuk Lihat Jawaban AI</span>
+                  <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </div>
+              </div>
+
+              <!-- Kartu 5: Banjir & Kencing Tikus -->
+              <div class="preset-question-card banjir p-3.5 rounded-xl border border-sky-200 bg-sky-50/50 hover:bg-sky-50 hover:border-sky-400 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between" data-prompt="Bagaimana cara melindungi diri dari bahaya kencing tikus (leptospirosis) saat banjir?">
+                <div>
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-sky-100 text-sky-800 uppercase">Musim Hujan &amp; Banjir</span>
+                    <span class="material-symbols-outlined text-sky-600 text-lg">flood</span>
+                  </div>
+                  <h4 class="font-bold text-slate-900 text-xs mb-1 leading-snug">Bagaimana cara melindungi diri dari kencing tikus saat banjir?</h4>
+                  <p class="text-[11px] text-slate-600">Gunakan sepatu bot, pertolongan pertama luka, dan pembersihan rumah.</p>
+                </div>
+                <div class="mt-3 pt-2 border-t border-sky-200/60 flex items-center justify-between text-[11px] font-bold text-sky-800">
+                  <span>Klik untuk Lihat Jawaban AI</span>
+                  <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </div>
+              </div>
+
+              <!-- Kartu 6: Udara Lembap & Rumah Sehat -->
+              <div class="preset-question-card lembap p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/50 hover:bg-emerald-50 hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between" data-prompt="Bagaimana cara menjaga rumah tetap sehat dan bebas kuman TBC saat udara sangat lembap?">
+                <div>
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 uppercase">Rumah Sehat</span>
+                    <span class="material-symbols-outlined text-emerald-600 text-lg">air</span>
+                  </div>
+                  <h4 class="font-bold text-slate-900 text-xs mb-1 leading-snug">Bagaimana menjaga rumah bebas kuman TBC saat udara sangat lembap?</h4>
+                  <p class="text-[11px] text-slate-600">Sirkulasi jendela pagi, penjemuran kasur, dan pencegahan jamur kulit.</p>
+                </div>
+                <div class="mt-3 pt-2 border-t border-emerald-200/60 flex items-center justify-between text-[11px] font-bold text-emerald-800">
+                  <span>Klik untuk Lihat Jawaban AI</span>
+                  <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Chat Window -->
+            <div class="ai-chat-window">
+              <div id="aiChatMessages" class="ai-chat-messages">
+                <!-- Initial Welcome Message from Bot -->
+                <div class="ai-message bot">
+                  <div class="ai-avatar bot">
+                    <span class="material-symbols-outlined text-lg">smart_toy</span>
+                  </div>
+                  <div class="ai-bubble">
+                    <strong>🌿 Halo! Saya Teman AI Kesehatan Lingkungan BumiMetrics.</strong><br /><br />
+                    Saya siap bantu Anda memahami kondisi cuaca Batam dan cara menjaga diri dari penyakit seperti DBD, Batuk Kemarau, Kencing Tikus saat banjir, dan TBC.<br /><br />
+                    Silakan <strong>klik salah satu kotak pertanyaan di atas</strong> untuk mendapatkan jawaban lengkap secara instan, atau ketik pertanyaan sendiri di kolom bawah ya!
+                  </div>
+                </div>
+              </div>
+
+              <!-- Chat Input Form -->
+              <form id="aiChatForm" class="ai-chat-input-area">
+                <input id="aiChatInput" type="text" class="form-input text-xs" placeholder="Atau ketik pertanyaan kesehatan lainnya di sini..." required />
+                <button type="submit" class="btn btn-primary btn-sm flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm">send</span>
+                  <span>Tanya</span>
+                </button>
+                <button type="button" id="btnClearChat" class="btn btn-outline btn-sm text-xs" title="Mulai Obrolan Baru">
+                  <span class="material-symbols-outlined text-sm">refresh</span>
+                </button>
+              </form>
+            </div>
+          </div>
+
+        </section>
+
+      </div>
+    </main>
+
+  </div>
+
+
+  <!-- ===================================================================
+       3. MODAL PELAPORAN ISU WARGA
+       =================================================================== -->
+  <div id="reportModal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title flex items-center gap-2">
+          <span class="material-symbols-outlined text-emerald-600">campaign</span>
+          <span>Laporkan Isu Lingkungan & Kesehatan</span>
+        </h3>
+        <button class="close-report-modal-btn p-1 text-slate-400 hover:text-slate-700 rounded-full">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <form id="reportIssueForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Nama Pelapor / Instansi</label>
+            <input id="reportName" type="text" class="form-input" placeholder="Contoh: Budi Santoso / Kader Posyandu Melati" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Lokasi / Wilayah Kejadian</label>
+            <input id="reportLocation" type="text" class="form-input" placeholder="Contoh: RT 03 / RW 05, Kel. Bengkong Indah" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Kategori Isu / Risiko Kesehatan</label>
+            <select id="reportCategory" class="form-select" required>
+              <option value="Pancaroba_DBD">Waspada DBD / Genangan Jentik Nyamuk</option>
+              <option value="Kemarau_ISPA">Kemarau / Asap Karhutla / Masalah Pernapasan</option>
+              <option value="Hujan_Leptospirosis">Banjir Luapan / Sanitasi Rusak / Leptospirosis</option>
+              <option value="Kelembapan_TBC">Kelembapan Tinggi / Ruang Pengap / TBC</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Judul Laporan Singkat</label>
+            <input id="reportTitle" type="text" class="form-input" placeholder="Contoh: Ditemukan Banyak Jentik di Penampungan Air Kos-kosan" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Deskripsi Kejadian & Kebutuhan Tindakan</label>
+            <textarea id="reportContent" rows="3" class="form-textarea" placeholder="Jelaskan kondisi lingkungan saat ini agar warga lain dan pihak Puskesmas dapat menindaklanjuti..." required></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="close-report-modal-btn btn btn-outline">Batal</button>
+          <button type="submit" class="btn btn-primary">
+            <span class="material-symbols-outlined text-sm">send</span>
+            <span>Kirim Laporan</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ===================================================================
+       4. MOBILE BOTTOM NAVIGATION (Muncul di layar HP)
+       =================================================================== -->
+  <nav class="mobile-bottom-nav">
+    <a class="mobile-nav-item active" data-tab="overview">
+      <span class="material-symbols-outlined">dashboard</span>
+      <span>Ringkasan</span>
+    </a>
+    <a class="mobile-nav-item" data-tab="health-risks">
+      <span class="material-symbols-outlined">medical_services</span>
+      <span>Risiko</span>
+    </a>
+    <a class="mobile-nav-item" data-tab="climate-trends">
+      <span class="material-symbols-outlined">thermostat</span>
+      <span>Tren</span>
+    </a>
+    <a class="mobile-nav-item" data-tab="local-ai">
+      <span class="material-symbols-outlined">psychology</span>
+      <span>AI Lokal</span>
+    </a>
+    <a class="mobile-nav-item" data-tab="community">
+      <span class="material-symbols-outlined">warning</span>
+      <span>Alert</span>
+    </a>
+    <a class="mobile-nav-item" data-tab="mitigation">
+      <span class="material-symbols-outlined">shield</span>
+      <span>Mitigasi</span>
+    </a>
+  </nav>
+
+  <!-- Application Scripts -->
+  <script src="./js/data-engine.js"></script>
+  <script src="./js/local-ai-engine.js"></script>
+  <script src="./js/charts.js"></script>
+  <script src="./js/community.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>
+

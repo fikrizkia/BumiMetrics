@@ -1,0 +1,183 @@
+{
+  "correlation_matrix": {
+    "Suhu_C": {
+      "Suhu_C": 1.0,
+      "Kelembapan_Percent": -0.4571,
+      "Curah_Hujan_mm": -0.3518,
+      "var_risk_score": 0.6298,
+      "pancaroba_dbd": 0.4909,
+      "elnino_ispa": 0.6904,
+      "lanina_lepto": -0.3932,
+      "humidity_tbc": -0.3123
+    },
+    "Kelembapan_Percent": {
+      "Suhu_C": -0.4571,
+      "Kelembapan_Percent": 1.0,
+      "Curah_Hujan_mm": 0.4482,
+      "var_risk_score": 0.1049,
+      "pancaroba_dbd": 0.1319,
+      "elnino_ispa": -0.7037,
+      "lanina_lepto": 0.5892,
+      "humidity_tbc": 0.7956
+    },
+    "Curah_Hujan_mm": {
+      "Suhu_C": -0.3518,
+      "Kelembapan_Percent": 0.4482,
+      "Curah_Hujan_mm": 1.0,
+      "var_risk_score": 0.1293,
+      "pancaroba_dbd": -0.1695,
+      "elnino_ispa": -0.5725,
+      "lanina_lepto": 0.7586,
+      "humidity_tbc": 0.3493
+    },
+    "var_risk_score": {
+      "Suhu_C": 0.6298,
+      "Kelembapan_Percent": 0.1049,
+      "Curah_Hujan_mm": 0.1293,
+      "var_risk_score": 1.0,
+      "pancaroba_dbd": 0.5315,
+      "elnino_ispa": 0.2014,
+      "lanina_lepto": 0.3515,
+      "humidity_tbc": 0.1056
+    },
+    "pancaroba_dbd": {
+      "Suhu_C": 0.4909,
+      "Kelembapan_Percent": 0.1319,
+      "Curah_Hujan_mm": -0.1695,
+      "var_risk_score": 0.5315,
+      "pancaroba_dbd": 1.0,
+      "elnino_ispa": -0.111,
+      "lanina_lepto": -0.1497,
+      "humidity_tbc": 0.2619
+    },
+    "elnino_ispa": {
+      "Suhu_C": 0.6904,
+      "Kelembapan_Percent": -0.7037,
+      "Curah_Hujan_mm": -0.5725,
+      "var_risk_score": 0.2014,
+      "pancaroba_dbd": -0.111,
+      "elnino_ispa": 1.0,
+      "lanina_lepto": -0.6235,
+      "humidity_tbc": -0.6158
+    },
+    "lanina_lepto": {
+      "Suhu_C": -0.3932,
+      "Kelembapan_Percent": 0.5892,
+      "Curah_Hujan_mm": 0.7586,
+      "var_risk_score": 0.3515,
+      "pancaroba_dbd": -0.1497,
+      "elnino_ispa": -0.6235,
+      "lanina_lepto": 1.0,
+      "humidity_tbc": 0.3848
+    },
+    "humidity_tbc": {
+      "Suhu_C": -0.3123,
+      "Kelembapan_Percent": 0.7956,
+      "Curah_Hujan_mm": 0.3493,
+      "var_risk_score": 0.1056,
+      "pancaroba_dbd": 0.2619,
+      "elnino_ispa": -0.6158,
+      "lanina_lepto": 0.3848,
+      "humidity_tbc": 1.0
+    }
+  },
+  "clinical_thresholds": {
+    "temperature": {
+      "dbd_optimal_min": 26.5,
+      "dbd_optimal_max": 29.5,
+      "ispa_heat_risk": 28.5
+    },
+    "humidity": {
+      "tbc_high_risk": 82.0,
+      "dry_throat_risk": 75.0
+    },
+    "rainfall": {
+      "drought_ispa_max": 80.0,
+      "dbd_breeding_min": 100.0,
+      "dbd_breeding_max": 240.0,
+      "flood_lepto_min": 250.0
+    }
+  },
+  "granger_causality_weights": {
+    "temperature_to_ispa": 0.42,
+    "temperature_to_dbd": 0.38,
+    "rainfall_to_lepto": 0.48,
+    "rainfall_to_dbd": 0.34,
+    "humidity_to_tbc": 0.45,
+    "humidity_to_fungal": 0.39
+  },
+  "monthly_seasonal_baselines": {
+    "JAN": {
+      "month_name": "Januari",
+      "avg_rain": 279.7,
+      "avg_hum": 82.8,
+      "avg_temp": 26.8
+    },
+    "FEB": {
+      "month_name": "Februari",
+      "avg_rain": 86.9,
+      "avg_hum": 80.2,
+      "avg_temp": 27.2
+    },
+    "MAR": {
+      "month_name": "Maret",
+      "avg_rain": 170.2,
+      "avg_hum": 81.0,
+      "avg_temp": 27.6
+    },
+    "APR": {
+      "month_name": "April",
+      "avg_rain": 176.5,
+      "avg_hum": 83.3,
+      "avg_temp": 27.8
+    },
+    "MEI": {
+      "month_name": "Mei",
+      "avg_rain": 214.2,
+      "avg_hum": 84.7,
+      "avg_temp": 27.9
+    },
+    "JUN": {
+      "month_name": "Juni",
+      "avg_rain": 179.5,
+      "avg_hum": 84.5,
+      "avg_temp": 27.6
+    },
+    "JUL": {
+      "month_name": "Juli",
+      "avg_rain": 221.9,
+      "avg_hum": 83.9,
+      "avg_temp": 27.4
+    },
+    "AGT": {
+      "month_name": "Agustus",
+      "avg_rain": 197.0,
+      "avg_hum": 84.0,
+      "avg_temp": 27.3
+    },
+    "SEP": {
+      "month_name": "September",
+      "avg_rain": 174.5,
+      "avg_hum": 84.3,
+      "avg_temp": 27.2
+    },
+    "OKT": {
+      "month_name": "Oktober",
+      "avg_rain": 202.5,
+      "avg_hum": 84.0,
+      "avg_temp": 27.4
+    },
+    "NOV": {
+      "month_name": "November",
+      "avg_rain": 262.2,
+      "avg_hum": 85.3,
+      "avg_temp": 27.0
+    },
+    "DES": {
+      "month_name": "Desember",
+      "avg_rain": 297.1,
+      "avg_hum": 84.5,
+      "avg_temp": 26.9
+    }
+  }
+}
